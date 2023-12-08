@@ -55,11 +55,22 @@ Genre.init(
 
 
 // Define many-to-many relationship
+Genre.belongsToMany(Book, {through: 'BookGenre'})
+Book.belongsToMany(Genre, {through: 'BookGenre'})
 
 // Create tables (drop if they already exist)
 await db.sync({ force: true });
 
 // Create some data
+const lotr = await Book.create({title: 'Lord of the Rings'})
+const treasureIsland = await Book.create({title: 'Treasure Island'})
+const fantasy = await Genre.create({name: 'Fantasy'})
+const adventure = await Genre.create({name: 'Adventure'})
+
+await lotr.addGenre(fantasy)
+await lotr.addGenre(adventure)
+await adventure.addBook(treasureIsland)
+
 
 
 export { Book, Genre };

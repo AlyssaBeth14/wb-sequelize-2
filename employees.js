@@ -65,6 +65,12 @@ Employee.init(
 );
 
 // Define relationships
+Department.hasMany(Employee, {foreignKey: 'deptCode'})
+//Allows us to use getEmployees and addEmployee method
+
+Employee.belongsTo(Department, {foreignKey: 'deptCode'})
+//belongs to will create a new column for the foreignkey if the columnn doesn't exist
+//Allows us to use getDepartment() and setDepartment() methods
 
 
 // Create all tables (drop if already exist)
@@ -90,8 +96,30 @@ const maggie = await Employee.create({
 const nadine = await Employee.create({ name: 'Nadine', state: 'AZ' });
 
 
+//nadine doesn't have department, to add her to a department
+fin.addEmployee(nadine)
+await nadine.save()
+//.save to save it in the database and not just locally
+//or
+// nadine.setDepartment(fin)
+
 
 // showPhoneDirectory();
+async function showPhoneDirectory() {
+  const emps = await Employee.findAll({where: {name: 'Liz'}, include: Department})
+
+  emps.forEach(async (employee) => {
+    const dept = await employee.getDepartment()
+    //dept = {deptCode: 'legal', deptName: 'Legal', phone: '555-2222'} for Liz
+    if(dept) {
+      console.log(employee.name, dept.deptName, dept.phone);
+    } else {
+      console.log(employee.name, '-', '-');
+    }
+  })
+}
+
+showPhoneDirectory()
 
 
 export { Department, Employee };
